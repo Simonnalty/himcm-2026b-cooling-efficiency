@@ -1,0 +1,7 @@
+,bus_dry,bus_humid,station_arid,station_humid
+B. Evaporative,212.0,108.0,,
+C. Large Evaporative,188.0,0.0,,
+A. Fan,,292.0,,
+P2 Evap always,,,0.0,42.0
+P3 Hybrid auto,,,400.0,358.0
+P4 Refrigerative,,,,0.0

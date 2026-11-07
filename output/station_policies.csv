@@ -1,0 +1,11 @@
+climate,policy,energy_kWh,person_hours,relief_pdegH,mean_relief_C,DHR,strain_pdegH,ok_share,cost_per_day_usd,cost_per_pdegH_usd,T_in_max,WBGT_max
+hot-arid,P0 No cooling,0.0,667.0,0.0,0.0,,728.0,0.157,1.6,,42.4,29.5
+hot-arid,P1 Fans only,9.6,667.0,1587.0,2.38,165.4,204.0,0.318,2.9,0.0018,42.4,28.8
+hot-arid,P2 Evap always,169.5,667.0,9651.0,14.46,56.9,0.0,1.0,29.2,0.003,29.6,25.1
+hot-arid,P3 Hybrid auto,95.8,667.0,6065.0,9.09,63.3,0.0,0.999,18.9,0.0031,32.5,25.9
+hot-arid,P4 Refrigerative,129.5,667.0,4059.0,6.08,31.3,0.0,0.509,22.4,0.0055,38.5,26.6
+hot-humid,P0 No cooling,0.0,667.0,0.0,0.0,,0.0,0.292,1.6,,34.5,29.6
+hot-humid,P1 Fans only,9.6,667.0,975.0,1.46,101.6,0.0,0.46,2.9,0.003,34.5,29.1
+hot-humid,P2 Evap always,169.5,667.0,4541.0,6.8,26.8,0.0,1.0,29.2,0.0064,27.5,27.4
+hot-humid,P3 Hybrid auto,85.3,667.0,2812.0,4.21,32.9,0.0,1.0,17.4,0.0062,30.5,28.0
+hot-humid,P4 Refrigerative,129.5,667.0,3447.0,5.17,26.6,0.0,1.0,22.4,0.0065,30.6,27.4

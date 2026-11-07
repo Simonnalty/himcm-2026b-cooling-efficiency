@@ -1,0 +1,11 @@
+climate,policy,kWh_day,kgCO2_day,tCO2_season
+hot-arid,P0 No cooling,0.0,0.0,0.0
+hot-arid,P1 Fans only,9.6,4.7,0.56
+hot-arid,P2 Evap always,169.5,83.1,9.97
+hot-arid,P3 Hybrid auto,95.8,46.9,5.63
+hot-arid,P4 Refrigerative,129.5,63.5,7.61
+hot-humid,P0 No cooling,0.0,0.0,0.0
+hot-humid,P1 Fans only,9.6,5.0,0.6
+hot-humid,P2 Evap always,169.5,88.1,10.58
+hot-humid,P3 Hybrid auto,85.3,44.4,5.32
+hot-humid,P4 Refrigerative,129.5,67.3,8.08

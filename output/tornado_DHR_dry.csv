@@ -1,0 +1,8 @@
+param,low,high,base,swing
+Occupancy N,33.3,66.7,50.0,33.3
+Rated drop dT_rated,35.0,65.0,50.0,30.0
+Electric power P,66.7,40.0,50.0,26.7
+Coverage area A,44.4,50.0,50.0,5.6
+Air temperature T,50.0,50.0,50.0,0.0
+Relative humidity RH,50.0,50.0,50.0,0.0
+Saturation effectiveness,50.0,50.0,50.0,0.0

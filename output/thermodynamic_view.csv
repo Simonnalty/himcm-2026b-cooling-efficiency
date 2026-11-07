@@ -1,0 +1,4 @@
+system,thermal_kW,ratio
+A. Fan,0.32,1.3
+B. Evaporative,5.025,4.2
+C. Large Evaporative,16.08,6.4

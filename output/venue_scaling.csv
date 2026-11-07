@@ -1,0 +1,13 @@
+venue,system,T_air,RH,dT_sys,n_served,relief,power_kW,benefit_pdegH_h,DHR,safe
+"Phoenix stadium concourse (hot-arid, dense)",Fans,40.0,0.2,3.0,400.0,3.0,0.8,1200.0,1500.0,yes
+"Phoenix stadium concourse (hot-arid, dense)",Medium evaporative,40.0,0.2,5.0,800.0,5.0,12.0,4000.0,333.3,yes
+"Phoenix stadium concourse (hot-arid, dense)",Large evaporative,40.0,0.2,8.0,1400.0,8.0,52.5,11200.0,213.3,yes
+"Guangzhou rail waiting hall (hot-humid, semi-open)",Fans,33.0,0.75,1.77,200.0,1.77,0.8,355.0,443.8,yes
+"Guangzhou rail waiting hall (hot-humid, semi-open)",Medium evaporative,33.0,0.75,3.28,400.0,3.28,12.0,1311.0,109.3,yes
+"Guangzhou rail waiting hall (hot-humid, semi-open)",Large evaporative,33.0,0.75,3.28,700.0,3.28,52.5,2294.0,43.7,yes
+"Singapore outdoor patio (hot-humid, open-air)",Fans,31.5,0.64,2.16,120.0,2.16,0.8,259.0,324.0,yes
+"Singapore outdoor patio (hot-humid, open-air)",Medium evaporative,31.5,0.64,4.75,120.0,4.5,12.0,540.0,45.0,yes
+"Singapore outdoor patio (hot-humid, open-air)",Large evaporative,31.5,0.64,4.75,120.0,4.5,52.5,540.0,10.3,yes
+"Honolulu airport pavilion (moderate, windy)",Fans,30.0,0.52,2.58,120.0,2.58,0.8,310.0,387.0,yes
+"Honolulu airport pavilion (moderate, windy)",Medium evaporative,30.0,0.52,5.0,240.0,3.0,12.0,720.0,60.0,yes
+"Honolulu airport pavilion (moderate, windy)",Large evaporative,30.0,0.52,6.39,250.0,3.0,52.5,750.0,14.3,yes

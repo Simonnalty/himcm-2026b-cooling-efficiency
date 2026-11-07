@@ -1,0 +1,4 @@
+option,feasible,perf,exp,energy,cost,E
+A. Fan,False,0.38,0.0,0.92,0.92,0.529
+B. Evaporative,True,0.62,0.25,0.65,0.65,0.545
+C. Large Evaporative,True,1.0,0.62,0.26,0.26,0.574

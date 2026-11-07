@@ -1,0 +1,6 @@
+option,feasible,perf,exp,energy,cost,E
+P0 No cooling,False,0.0,0.29,1.0,0.95,0.512
+P1 Fans only,False,0.18,0.46,0.94,0.9,0.586
+P2 Evap always,True,0.85,1.0,0.0,0.0,0.505
+P3 Hybrid auto,True,0.53,1.0,0.5,0.4,0.613
+P4 Refrigerative,True,0.65,1.0,0.24,0.23,0.549
