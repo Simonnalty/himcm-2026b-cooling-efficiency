@@ -422,36 +422,36 @@
  "validation_convergence": [
   {
    "dt_s": 120.0,
-   "kWh": 87.58,
-   "Tin_max": 32.731,
+   "kWh": 96.247,
+   "Tin_max": 32.808,
    "strain": 0.0,
-   "dev_from_finest": 0.79
+   "dev_from_finest": 0.044
   },
   {
    "dt_s": 60.0,
-   "kWh": 88.923,
-   "Tin_max": 32.56,
+   "kWh": 95.757,
+   "Tin_max": 32.513,
    "strain": 0.0,
-   "dev_from_finest": 0.553
+   "dev_from_finest": 0.446
   },
   {
    "dt_s": 30.0,
-   "kWh": 87.512,
-   "Tin_max": 32.452,
+   "kWh": 95.845,
+   "Tin_max": 32.504,
    "strain": 0.0,
-   "dev_from_finest": 0.858
+   "dev_from_finest": 0.358
   },
   {
    "dt_s": 15.0,
-   "kWh": 87.181,
-   "Tin_max": 32.455,
+   "kWh": 95.848,
+   "Tin_max": 32.408,
    "strain": 0.0,
-   "dev_from_finest": 1.189
+   "dev_from_finest": 0.355
   },
   {
    "dt_s": 7.5,
-   "kWh": 88.37,
-   "Tin_max": 32.428,
+   "kWh": 96.203,
+   "Tin_max": 32.426,
    "strain": 0.0,
    "dev_from_finest": 0.0
   }

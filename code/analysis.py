@@ -359,7 +359,7 @@ def metrics_vs_base(pre, base, r, T_acc=30.0):
 # ---- (a) numerical convergence: Euler step-size independence ----
 conv = []
 for dt in [120.0, 60.0, 30.0, 15.0, 7.5]:
-    r = simulate_station(27.0, 40.0, 0.15, 0.35, POLICIES["P3 Hybrid auto"], dt=dt)
+    r = simulate_station(**STATION_CLIMATES["hot-arid"], policy=POLICIES["P3 Hybrid auto"], dt=dt)
     conv.append(dict(dt_s=dt, kWh=round(r["kWh"], 3), Tin_max=round(float(np.max(r["Tin"])), 3),
                      strain=round(float(np.trapezoid(
                          r["N"] * (np.maximum(0.0, r["WB"] - WBGT_SAFE) + np.maximum(0.0, r["Tp"] - T_STRAIN)),
@@ -677,7 +677,7 @@ def tornado_rows(T, RH, Nbase):
     return pd.DataFrame(rows).sort_values("swing", ascending=False), base
 
 torn_df, torn_base_dry = tornado_rows(41.0, 0.20, 12)
-torn_df_humid, torn_base_humid = tornado_rows(33.0, 0.70, 12)
+torn_df_humid, torn_base_humid = tornado_rows(32.0, 0.63, 12)
 torn_df.to_csv(os.path.join(OUT, "tornado_DHR_dry.csv"), index=False)
 torn_df_humid.to_csv(os.path.join(OUT, "tornado_DHR_humid.csv"), index=False)
 
@@ -721,9 +721,9 @@ def fig2_response():
     for key, rated, colr in [("B", 5.0, COL["B"]), ("C", 8.0, COL["C"])]:
         ys = [min(rated, ETA_EVAP * d) for d in dbd]
         ax.plot(dbd, ys, color=colr, lw=2, label=f"System {key} (rated {rated:.0f}$^\\circ$C)")
-    ax.axvline(4.6, ls="--", c="gray", lw=1)
-    ax.annotate("Miami-type humid\ndepression $\\approx$ 4.6 K", xy=(4.6, 4.2), fontsize=8,
-                xytext=(6.2, 1.6), arrowprops=dict(arrowstyle="->", lw=1))
+    ax.axvline(5.8, ls="--", c="gray", lw=1)
+    ax.annotate("Miami-type humid\ndepression $\\approx$ 5.8 K", xy=(5.8, 4.2), fontsize=8,
+                xytext=(7.4, 1.6), arrowprops=dict(arrowstyle="->", lw=1))
     ax.annotate("Phoenix-type dry\ndepression $\\approx$ 19 K", xy=(18, 8), fontsize=8, ha="right")
     ax.set_xlabel("Wet-bulb depression $T_{db}-T_{wb}$ (K)")
     ax.set_ylabel("Actual air-temperature drop (degC)")

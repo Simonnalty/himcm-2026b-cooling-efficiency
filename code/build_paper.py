@@ -10,7 +10,9 @@ PAPER = os.path.join(ROOT, "paper")
 src = open(os.path.join(PAPER, "paper.tex"), encoding="utf-8").read()
 for ph, name in [("%%TABLE_BUS%%", "t_bus"), ("%%TABLE_STATION%%", "t_station"),
                  ("%%TABLE_EFF%%", "t_eff"), ("%%TABLE_VENUE%%", "t_venue"),
-                 ("%%TABLE_TORNADO%%", "t_tornado")]:
+                 ("%%TABLE_TORNADO%%", "t_tornado"), ("%%TABLE_VALID%%", "t_valid"),
+                 ("%%TABLE_ROBUST%%", "t_robust"), ("%%TABLE_MC%%", "t_mc"),
+                 ("%%TABLE_BUSFULL%%", "t_bus_full")]:
     frag = open(os.path.join(PAPER, "gen", name + ".tex"), encoding="utf-8").read()
     src = src.replace(ph, frag.replace("\r\n", "\n"))
 out = os.path.join(PAPER, "paper_build.tex")
