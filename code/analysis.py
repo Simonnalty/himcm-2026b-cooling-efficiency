@@ -682,102 +682,178 @@ torn_df.to_csv(os.path.join(OUT, "tornado_DHR_dry.csv"), index=False)
 torn_df_humid.to_csv(os.path.join(OUT, "tornado_DHR_humid.csv"), index=False)
 
 # =====================================================================
-# 6. FIGURES
+from matplotlib.patches import FancyBboxPatch
+# ---------- V3 figure style ----------
+plt.rcParams.update({
+    "figure.dpi": 200, "savefig.dpi": 300, "savefig.bbox": "tight",
+    "font.size": 10.5,
+    "axes.grid": True, "grid.alpha": 0.25, "grid.linewidth": 0.6, "axes.axisbelow": True,
+    "axes.spines.top": False, "axes.spines.right": False,
+    "axes.edgecolor": "#455A64", "axes.linewidth": 0.9,
+    "axes.titlesize": 11.5, "axes.titleweight": "bold", "axes.titlepad": 8,
+    "axes.labelsize": 10.5, "axes.labelcolor": "#263238",
+    "xtick.labelsize": 9.5, "ytick.labelsize": 9.5,
+    "xtick.color": "#455A64", "ytick.color": "#455A64",
+    "legend.fontsize": 8.5, "legend.frameon": False,
+    "lines.solid_capstyle": "round",
+})
+COL = {"A": "#1B6CA8", "B": "#E8871E", "C": "#2E9E5B",
+       "P0": "#8D99AE", "P1": "#1B6CA8", "P2": "#2E9E5B", "P3": "#D64550", "P4": "#7D5BA6",
+       "ink": "#263238", "grid": "#B0BEC5"}
+
+def _vlab(ax, bars, fmt="{:.0f}", fs=8, dy_frac=0.02):
+    ymax = ax.get_ylim()[1]
+    for b in bars:
+        ax.text(b.get_x() + b.get_width() / 2, b.get_height() + ymax * dy_frac,
+                fmt.format(b.get_height()), ha="center", va="bottom",
+                fontsize=fs, color=COL["ink"], fontweight="bold")
+
+def _box(ax, x, y, w, h, fc, title, sub, tfs=10.5, sfs=7.8):
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.10",
+                                fc=fc, ec="#37474F", lw=1.1))
+    ax.text(x + w / 2, y + h - 0.30, title, ha="center", va="center",
+            fontsize=tfs, fontweight="bold", color=COL["ink"])
+    ax.text(x + w / 2, y + 0.32 * h, sub, ha="center", va="center", fontsize=sfs, color="#37474F")
+
 # =====================================================================
+def fig0_framework():
+    fig, ax = plt.subplots(figsize=(7.6, 6.2))
+    ax.set_xlim(0, 10); ax.set_ylim(0, 12); ax.axis("off")
+    layers = [
+        ("Inputs", "climate profiles (NOAA normals) · venue geometry\nfleet sizes & tariff / carbon intensity", "#ECEFF1"),
+        ("Layer 1 — Physics", "psychrometric wet bulb · evaporative / fan / refrigerative limits\ntransient zone heat balance (30-s Euler, validated vs analytic)", "#D6E7F5"),
+        ("Layer 2 — People", "perceived temperature · comfort cap 27°C · acceptable 30°C\nWBGT$_{eff}$ heat-strain safety model", "#DDEFDC"),
+        ("Layer 3 — Efficiency", "DHR = person-°C·h relief / kWh\ncost per delivered relief · CO$_2$ per season", "#FCEBC8"),
+        ("Layer 4 — Effectiveness", "hard service floor (80% acceptable) · weighted utility\nPareto frontier · grid-search optimisation · Monte-Carlo", "#F6DBDB"),
+        ("Decisions", "fleet selection · thermostat setpoints · tiered operations\nextreme-heat playbook", "#E9E1F2"),
+    ]
+    y, H = 11.7, 1.42
+    for i, (t, sub, c) in enumerate(layers):
+        _box(ax, 0.8, y - H, 8.4, H, c, t, sub)
+        if i < len(layers) - 1:
+            ax.annotate("", xy=(5.0, y - H - 0.40), xytext=(5.0, y - H),
+                        arrowprops=dict(arrowstyle="-|>", lw=1.8, color="#37474F"))
+        y -= 1.92
+    ax.text(9.35, 9.9, "feedback:\nsensitivity ·\nuncertainty\nre-open layer 1", fontsize=7.6,
+            ha="center", va="top", color="#607D8B", style="italic")
+    ax.annotate("", xy=(9.28, 9.85), xytext=(9.28, 4.2),
+                arrowprops=dict(arrowstyle="-|>", lw=1.2, color="#90A4AE",
+                                connectionstyle="arc3,rad=-0.35"))
+    fig.savefig(os.path.join(FIG, "fig0_framework.png")); plt.close(fig)
+
 def fig1_schematic():
-    fig, ax = plt.subplots(figsize=(8.6, 4.8))
+    fig, ax = plt.subplots(figsize=(8.8, 4.8))
     ax.set_xlim(0, 12.6); ax.set_ylim(0, 6); ax.axis("off")
-    ax.add_patch(Rectangle((1.5, 1.2), 7.5, 3.6, fill=False, lw=2.2, ec="k"))
-    ax.text(5.25, 5.15, "Control volume: shelter / waiting hall (semi-open)", ha="center", fontsize=11)
-    ax.add_patch(Rectangle((3.2, 1.2), 4.0, 1.0, fc="#a6cee3", alpha=0.7))
-    ax.text(5.2, 1.7, "occupied zone (people)", ha="center", fontsize=9)
-    ax.text(9.35, 3.9, "open boundary:\nair exchange $\\dot{V}=\\lambda V$", fontsize=9, va="top")
+    ax.add_patch(Rectangle((1.5, 1.2), 7.5, 3.6, fill=False, lw=2.4, ec="#37474F"))
+    ax.text(5.25, 5.2, "Control volume: shelter / waiting hall (semi-open)",
+            ha="center", fontsize=11.5, fontweight="bold", color=COL["ink"])
+    ax.add_patch(Rectangle((3.2, 1.2), 4.0, 1.0, fc="#B3D4EE", alpha=0.85, ec="none"))
+    ax.text(5.2, 1.7, "occupied zone (people)", ha="center", fontsize=9, color="#37474F")
+    ax.text(9.35, 4.05, "open boundary:\nair exchange $\\dot{V}=\\lambda V$", fontsize=9, va="top", color=COL["ink"])
     ax.annotate("", xy=(9.9, 3.0), xytext=(9.05, 3.0),
-                arrowprops=dict(arrowstyle="<->", lw=1.6))
-    ax.annotate("", xy=(1.5, 3.0), xytext=(0.6, 3.0),
-                arrowprops=dict(arrowstyle="->", lw=1.8, color="#e31a1c"))
-    ax.text(0.45, 3.25, "$Q_{solar}$", color="#e31a1c", fontsize=10)
-    ax.annotate("", xy=(1.9, 1.15), xytext=(1.9, 0.62),
-                arrowprops=dict(arrowstyle="->", lw=1.8, color="#b8860b"))
-    ax.text(2.08, 0.62, "$Q_{ground}$", color="#b8860b", fontsize=10)
-    ax.annotate("", xy=(4.6, 3.1), xytext=(4.6, 3.85),
-                arrowprops=dict(arrowstyle="->", lw=1.8, color="#1f77b4"))
-    ax.text(3.1, 3.95, "$N q_{p}$  (people)", color="#1f77b4", fontsize=10)
-    ax.annotate("", xy=(6.6, 2.35), xytext=(6.6, 3.2),
-                arrowprops=dict(arrowstyle="->", lw=1.8, color="#2ca02c"))
-    ax.text(6.75, 3.3, "$Q_{cool}$", color="#2ca02c", fontsize=10)
-    ax.text(6.95, 1.75, "useful jet reaches people;\nrest escapes to ambient", fontsize=8)
-    ax.annotate("", xy=(11.6, 2.4), xytext=(10.0, 2.4),
-                arrowprops=dict(arrowstyle="->", lw=1.8, color="#808080"))
-    ax.text(10.8, 2.62, "lost cooling\n(dissipation)", color="#808080", fontsize=8, ha="center")
-    ax.text(5.4, 0.18, "Efficiency = useful cooling delivered at the person / energy consumed",
-            ha="center", fontsize=10, style="italic")
+                arrowprops=dict(arrowstyle="<->", lw=1.8, color="#455A64"))
+    ax.annotate("", xy=(1.5, 3.0), xytext=(0.55, 3.0),
+                arrowprops=dict(arrowstyle="-|>", lw=2.2, color="#D64550"))
+    ax.text(0.4, 3.3, "$Q_{solar}$", color="#D64550", fontsize=11, fontweight="bold")
+    ax.annotate("", xy=(1.9, 1.15), xytext=(1.9, 0.66),
+                arrowprops=dict(arrowstyle="-|>", lw=2.2, color="#E8871E"))
+    ax.text(2.08, 0.62, "$Q_{ground}$", color="#E8871E", fontsize=11, fontweight="bold")
+    ax.annotate("", xy=(4.6, 3.05), xytext=(4.6, 3.85),
+                arrowprops=dict(arrowstyle="-|>", lw=2.2, color="#1B6CA8"))
+    ax.text(3.0, 4.0, "$Nq_{p}$  (people)", color="#1B6CA8", fontsize=11, fontweight="bold")
+    ax.annotate("", xy=(6.6, 2.3), xytext=(6.6, 3.2),
+                arrowprops=dict(arrowstyle="-|>", lw=2.2, color="#2E9E5B"))
+    ax.text(6.8, 3.35, "$Q_{cool}$", color="#2E9E5B", fontsize=11, fontweight="bold")
+    ax.text(6.92, 1.62, "useful jet reaches people;\nrest escapes to ambient", fontsize=8, color="#607D8B")
+    ax.annotate("", xy=(11.7, 2.35), xytext=(10.0, 2.35),
+                arrowprops=dict(arrowstyle="-|>", lw=2.0, color="#90A4AE", ls="--"))
+    ax.text(10.85, 2.62, "lost cooling\n(dissipation)", color="#78909C", fontsize=8.5, ha="center")
+    ax.text(5.4, 0.28, "Efficiency = useful cooling delivered at the person / energy consumed",
+            ha="center", fontsize=10.5, style="italic", color=COL["ink"],
+            bbox=dict(fc="#FFF8E1", ec="#E8871E", lw=0.8, boxstyle="round,pad=0.35"))
     fig.savefig(os.path.join(FIG, "fig1_control_volume.png")); plt.close(fig)
 
 def fig2_response():
-    fig, axes = plt.subplots(1, 2, figsize=(9.6, 4.0))
+    fig, axes = plt.subplots(1, 2, figsize=(9.8, 4.1))
     ax = axes[0]
-    dbd = np.linspace(0, 18, 100)
-    for key, rated, colr in [("B", 5.0, COL["B"]), ("C", 8.0, COL["C"])]:
+    dbd = np.linspace(0, 18, 200)
+    for key, rated, colr, lw in [("B", 5.0, COL["B"], 2.4), ("C", 8.0, COL["C"], 2.4)]:
         ys = [min(rated, ETA_EVAP * d) for d in dbd]
-        ax.plot(dbd, ys, color=colr, lw=2, label=f"System {key} (rated {rated:.0f}$^\\circ$C)")
-    ax.axvline(5.8, ls="--", c="gray", lw=1)
-    ax.annotate("Miami-type humid\ndepression $\\approx$ 5.8 K", xy=(5.8, 4.2), fontsize=8,
-                xytext=(7.4, 1.6), arrowprops=dict(arrowstyle="->", lw=1))
-    ax.annotate("Phoenix-type dry\ndepression $\\approx$ 18 K", xy=(18, 8), fontsize=8, ha="right")
+        ax.plot(dbd, ys, color=colr, lw=lw)
+    ax.text(17.6, 8.9, "System C — 2.5 kW", color=COL["C"], fontsize=9, fontweight="bold", ha="right")
+    ax.text(17.6, 5.5, "System B — 1.2 kW", color=COL["B"], fontsize=9, fontweight="bold", ha="right")
+    ax.axvspan(0, 5.88, color="#ECEFF1", alpha=0.7, zorder=0)
+    ax.text(2.9, 7.3, "wet-bulb limited\n(tropical / humid)", fontsize=8, ha="center", color="#607D8B")
+    ax.text(12.0, 7.3, "rated-cap limited\n(arid)", fontsize=8, ha="center", color="#607D8B")
+    for x, lab in [(5.8, "Miami\n5.8 K"), (18.0, "Phoenix\n18 K")]:
+        ax.axvline(x, ls="--", c="#90A4AE", lw=1.1)
+        ax.text(x - 0.35, 0.4, lab, fontsize=8, ha="right", color="#455A64", rotation=90)
+    ax.set_xlim(0, 18); ax.set_ylim(0, 9.6)
     ax.set_xlabel("Wet-bulb depression $T_{db}-T_{wb}$ (K)")
-    ax.set_ylabel("Actual air-temperature drop (degC)")
+    ax.set_ylabel("Actual air-temperature drop (°C)")
     ax.set_title("(a) Evaporative systems: climate-limited")
-    ax.legend(fontsize=8, loc="lower right")
     ax = axes[1]
-    rh = np.linspace(0.2, 1.0, 100)
-    ax.plot(rh * 100, [fan_dT(33.0, r) for r in rh], color=COL["A"], lw=2)
+    rh = np.linspace(0.2, 1.0, 200)
+    ax.plot(rh * 100, [fan_dT(33.0, r) for r in rh], color=COL["A"], lw=2.4)
+    ax.text(22, 3.15, "Fan — 0.25 kW", color=COL["A"], fontsize=9, fontweight="bold")
+    ax.axvspan(40, 100, color="#ECEFF1", alpha=0.7, zorder=0)
+    ax.text(70, 1.35, "sweat evaporation suppressed\nbenefit decays linearly", fontsize=8,
+            ha="center", color="#607D8B")
+    ax.set_xlim(20, 100); ax.set_ylim(0.5, 3.4)
     ax.set_xlabel("Relative humidity (%)")
-    ax.set_ylabel("Perceived cooling (degC)")
+    ax.set_ylabel("Perceived cooling (°C)")
     ax.set_title("(b) Fan system: humidity-limited")
-    ax.annotate("full benefit below ~40% RH", xy=(40, 3.0), xytext=(52, 2.3), fontsize=8,
-                arrowprops=dict(arrowstyle="->", lw=1))
     fig.savefig(os.path.join(FIG, "fig2_system_response.png")); plt.close(fig)
 
 def fig3_bus():
     clis = list(CLIMATES.keys())
-    short = ["Phoenix\n41C/20%", "Miami\n33C/70%", "Heatwave\n36C/60%", "Honolulu\n30C/55%"]
-    fig, axes = plt.subplots(1, 2, figsize=(10.4, 4.2))
-    for ax, N, title in zip(axes, [12, 20], ["(a) peak occupancy N=12", "(b) crush occupancy N=20"]):
+    short = ["Phoenix\n41°C / 20%", "Miami\n32°C / 63%", "Heatwave\n36°C / 60%", "Honolulu\n30°C / 52%"]
+    fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.3))
+    for ax, N, title in zip(axes, [12, 20],
+                            ["(a) peak occupancy N = 12", "(b) crush occupancy N = 20"]):
         x = np.arange(len(clis)); w = 0.26
+        allbars = []
         for k, (sname, colr) in enumerate(zip(BUS_SYS.keys(), [COL["A"], COL["B"], COL["C"]])):
-            vals = [bus_df[(bus_df["system"] == sname) & (bus_df["T_air"] == c["T"]) &
-                           (bus_df["N"] == N)]["DHR"].iloc[0] for c in CLIMATES.values()]
-            ax.bar(x + (k - 1) * w, vals, w, color=colr, label=sname)
-        ax.set_xticks(x); ax.set_xticklabels(short, fontsize=8)
-        ax.set_ylabel("DHR (person-$^\\circ$C$\\cdot$h / kWh)")
-        ax.set_title(title); ax.legend(fontsize=8)
+            vals = [float(bus_df[(bus_df["system"] == sname) & (bus_df["T_air"] == c["T"]) &
+                                 (bus_df["N"] == N)]["DHR"].iloc[0]) for c in CLIMATES.values()]
+            bars = ax.bar(x + (k - 1) * w, vals, w, color=colr, label=sname,
+                          edgecolor="white", linewidth=0.6)
+            allbars.extend(bars)
+        _vlab(ax, allbars, "{:.0f}", fs=7.2, dy_frac=0.015)
+        ax.set_xticks(x); ax.set_xticklabels(short, fontsize=8.5)
+        ax.set_ylabel("DHR (person-°C·h / kWh)")
+        ax.set_title(title); ax.legend(fontsize=8, ncol=3, loc="upper right")
+        ax.set_ylim(0, 108)
     fig.savefig(os.path.join(FIG, "fig3_bus_DHR.png")); plt.close(fig)
 
 def fig4_station_timeseries():
-    fig, axes = plt.subplots(2, 3, figsize=(12.6, 6.6), sharex=True)
+    fig, axes = plt.subplots(2, 3, figsize=(13.0, 6.8), sharex=True)
+    pols = [("P0 No cooling", COL["P0"]), ("P1 Fans only", COL["P1"]),
+            ("P2 Evap always", COL["P2"]), ("P3 Hybrid auto", COL["P3"]),
+            ("P4 Refrigerative", COL["P4"])]
     for row, cl in enumerate(["hot-arid", "hot-humid"]):
         r0 = station_runs[(cl, "P0 No cooling")]
-        # 15-min rolling mean: pulses to ~95 persons every 12-20 min train arrival
         Ns = pd.Series(r0["N"]).rolling(30, center=True, min_periods=1).mean()
-        axes[row, 0].plot(r0["t_h"], Ns, color="k", lw=1.8)
+        axes[row, 0].plot(r0["t_h"], Ns, color=COL["ink"], lw=1.8)
         axes[row, 0].set_ylim(0, 110)
-        axes[row, 0].text(0.03, 0.92, "pulses to ~95 persons per train arrival",
-                          transform=axes[row, 0].transAxes, fontsize=7, va="top")
+        axes[row, 0].text(0.03, 0.94, "pulses to ~95 persons per train arrival",
+                          transform=axes[row, 0].transAxes, fontsize=7.5, va="top", color="#607D8B")
         axes[row, 0].set_ylabel("occupancy N (persons)")
-        axes[row, 0].set_title(f"{'(a-d) ' if row==0 else ''}Occupancy ({cl}, 15-min mean)")
-        for pname, colr in [("P0 No cooling", COL["P0"]), ("P1 Fans only", COL["P1"]),
-                            ("P2 Evap always", COL["P2"]), ("P3 Hybrid auto", COL["P3"]),
-                            ("P4 Refrigerative", COL["P4"])]:
+        axes[row, 0].set_title(f"Occupancy ({cl}, 15-min mean)", fontsize=10.5)
+        for pname, colr in pols:
             r = station_runs[(cl, pname)]
-            axes[row, 1].plot(r["t_h"], r["Tin"], color=colr, lw=1.5, label=pname)
-            axes[row, 2].plot(r["t_h"], r["WB"], color=colr, lw=1.5)
-        axes[row, 1].plot(r0["t_h"], r0["Tout"], color="k", lw=1.2, ls="--", label="$T_{out}$")
-        axes[row, 2].axhline(WBGT_SAFE, color="r", ls="--", lw=1.2)
-        axes[row, 2].text(6.2, WBGT_SAFE + 0.15, "WBGT safe limit 32", color="r", fontsize=8)
-        axes[row, 1].set_ylabel("$T_{in}$ (degC)")
-        axes[row, 2].set_ylabel("WBGT$_{eff}$ (degC)")
-    axes[0, 1].legend(fontsize=7, ncol=2)
+            lw = 2.6 if pname.startswith("P3") else 1.5
+            axes[row, 1].plot(r["t_h"], r["Tin"], color=colr, lw=lw, alpha=1.0 if pname.startswith("P3") else 0.9)
+            axes[row, 2].plot(r["t_h"], r["WB"], color=colr, lw=lw, alpha=1.0 if pname.startswith("P3") else 0.9)
+        axes[row, 1].plot(r0["t_h"], r0["Tout"], color=COL["ink"], lw=1.2, ls="--")
+        axes[row, 1].text(21.9, float(r0["Tout"][-1]) + 0.5, "$T_{out}$", fontsize=8, ha="right", color=COL["ink"])
+        axes[row, 2].axhspan(WBGT_SAFE, axes[row, 2].get_ylim()[1], color="#D64550", alpha=0.06, zorder=0)
+        axes[row, 2].axhline(WBGT_SAFE, color="#D64550", ls="--", lw=1.3)
+        axes[row, 2].text(6.2, WBGT_SAFE + 0.18, "WBGT safe limit 32°C", color="#D64550", fontsize=8,
+                          fontweight="bold")
+        axes[row, 1].set_ylabel("$T_{in}$ (°C)")
+        axes[row, 2].set_ylabel("WBGT$_{eff}$ (°C)")
+    axes[0, 1].legend([p for p, _ in pols], fontsize=7.2, ncol=2, loc="lower right")
     for ax in axes[1]:
         ax.set_xlabel("hour of day")
     fig.savefig(os.path.join(FIG, "fig4_station_timeseries.png")); plt.close(fig)
@@ -785,82 +861,99 @@ def fig4_station_timeseries():
 def fig5_station_bars():
     pols = list(POLICIES.keys())
     x = np.arange(len(pols))
-    fig, axes = plt.subplots(2, 2, figsize=(10.6, 6.4), sharex=True)
+    fig, axes = plt.subplots(2, 2, figsize=(10.8, 6.6), sharex=True)
     for row, cl in enumerate(["hot-arid", "hot-humid"]):
         df = station_df[station_df["climate"] == cl].set_index("policy").loc[pols]
         cols = [COL[p.split()[0]] for p in pols]
         ax = axes[row, 0]
-        ax.bar(x, df["energy_kWh"], 0.62, color=cols)
-        ax.set_ylabel("energy (kWh/day)")
-        ax.set_title(f"{cl}: electricity")
-        for i, v in enumerate(df["energy_kWh"]):
-            ax.text(i, v + 3, f"{v:.0f}", ha="center", fontsize=8)
+        bars = ax.bar(x, df["energy_kWh"], 0.62, color=cols, edgecolor="white", linewidth=0.6)
+        _vlab(ax, bars, "{:.0f}", fs=8, dy_frac=0.015)
+        ax.set_ylabel("electricity (kWh/day)")
+        ax.set_title(f"{cl}: electricity", fontsize=10.5)
         ax2 = axes[row, 1]
-        ax2.bar(x, df["strain_pdegH"], 0.62, color=cols, hatch="//", edgecolor="k")
-        ax2.set_ylabel("person-degC$\\cdot$h above safe limits")
-        ax2.set_title(f"{cl}: heat-strain exposure")
+        bars2 = ax2.bar(x, df["strain_pdegH"], 0.62, color=cols, edgecolor="white", linewidth=0.6)
         ymax = max(float(df["strain_pdegH"].max()), 1.0)
         ax2.set_ylim(0, ymax * 1.3 + 2)
+        _vlab(ax2, bars2, "{:.0f}", fs=8, dy_frac=0.03)
+        ax2.set_ylabel("person-°C·h above safe limits")
+        ax2.set_title(f"{cl}: heat-strain exposure", fontsize=10.5)
         if float(df["strain_pdegH"].max()) == 0.0:
             ax2.text(0.5, 0.55, "no exceedance of safe limits", transform=ax2.transAxes,
-                     ha="center", fontsize=9, color="#555555")
-        for i, v in enumerate(df["strain_pdegH"]):
-            ax2.text(i, v + ymax * 0.03, f"{v:.0f}", ha="center", fontsize=8)
+                     ha="center", fontsize=9, color="#607D8B")
     for ax in axes[1]:
-        ax.set_xticks(x); ax.set_xticklabels([p.split(" ")[0] for p in pols])
+        ax.set_xticks(x); ax.set_xticklabels([p.split(" ")[0] for p in pols], fontweight="bold")
     fig.savefig(os.path.join(FIG, "fig5_policy_bars.png")); plt.close(fig)
 
 def fig6_venues():
     piv = venue_df.pivot(index="venue", columns="system", values="DHR")
     order = list(VENUES.keys()); sys_order = ["Fans", "Medium evaporative", "Large evaporative"]
     piv = piv.loc[order, sys_order]
-    fig, ax = plt.subplots(figsize=(9.4, 3.8))
+    short_rows = ["Stadium concourse\nPhoenix · hot-arid · dense",
+                  "Rail waiting hall\nGuangzhou · hot-humid",
+                  "Outdoor patio\nSingapore · hot-humid",
+                  "Airport pavilion\nHonolulu · moderate"]
+    fig, ax = plt.subplots(figsize=(9.6, 4.0))
     im = ax.imshow(piv.values, cmap="YlGnBu", aspect="auto")
-    ax.set_xticks(range(len(sys_order))); ax.set_xticklabels(sys_order, fontsize=9)
-    ax.set_yticks(range(len(order)))
-    ax.set_yticklabels([o.split("(")[0].strip() for o in order], fontsize=8)
+    ax.set_xticks(range(len(sys_order))); ax.set_xticklabels(sys_order, fontsize=9.5)
+    ax.set_yticks(range(len(order))); ax.set_yticklabels(short_rows, fontsize=8.5)
+    vmax = piv.values.max()
     for i in range(piv.shape[0]):
         for j in range(piv.shape[1]):
-            ax.text(j, i, f"{piv.values[i, j]:.0f}", ha="center", va="center",
-                    color="white" if piv.values[i, j] > piv.values.max() * 0.6 else "k", fontsize=9)
-    fig.colorbar(im, ax=ax, label="DHR (person-$^\\circ$C$\\cdot$h/kWh)")
-    ax.set_title("Cooling efficiency across venues x systems (model scales unchanged)")
+            v = piv.values[i, j]
+            ax.text(j, i, f"{v:.0f}", ha="center", va="center", fontsize=11,
+                    fontweight="bold", color="white" if v > vmax * 0.55 else COL["ink"])
+    for i in range(piv.shape[0] + 1):
+        ax.axhline(i - 0.5, color="white", lw=2)
+    for j in range(piv.shape[1] + 1):
+        ax.axvline(j - 0.5, color="white", lw=2)
+    fig.colorbar(im, ax=ax, shrink=0.9, label="DHR (person-°C·h/kWh)")
+    ax.set_title("Cooling efficiency across venues × systems (model scales unchanged)")
     ax.grid(False)
     fig.savefig(os.path.join(FIG, "fig6_venue_heatmap.png")); plt.close(fig)
 
 def fig7_pareto():
-    fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.4))
-    for ax, cl, title in zip(axes, ["hot-arid", "hot-humid"], ["(a) station, hot-arid", "(b) station, hot-humid"]):
+    fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.5))
+    for ax, cl, title in zip(axes, ["hot-arid", "hot-humid"],
+                             ["(a) station, hot-arid — P3 dominates P4", "(b) station, hot-humid — P3 & P4 on the frontier"]):
         df = station_df[station_df["climate"] == cl]
         for _, r in df.iterrows():
-            ax.scatter(r["cost_per_day_usd"], r["mean_relief_C"], s=90,
-                       color=COL[r["policy"].split()[0]], zorder=3)
-            ax.annotate(r["policy"].split(" ")[0] + f" ({r['mean_relief_C']:.1f}C)",
+            ax.scatter(r["cost_per_day_usd"], r["mean_relief_C"], s=130,
+                       color=COL[r["policy"].split()[0]], edgecolor="white", lw=1.2, zorder=3)
+            ax.annotate(r["policy"].split(" ")[0] + f" ({r['mean_relief_C']:.1f}°C)",
                         (r["cost_per_day_usd"], r["mean_relief_C"]),
-                        textcoords="offset points", xytext=(6, 4), fontsize=8)
+                        textcoords="offset points", xytext=(7, 5), fontsize=8.5,
+                        color=COL["ink"], fontweight="bold")
         pts = df[["cost_per_day_usd", "mean_relief_C"]].values
         order = np.argsort(pts[:, 0])
-        ax.plot(pts[order, 0], pts[order, 1], "k--", lw=1, alpha=0.6)
+        ax.plot(pts[order, 0], pts[order, 1], "--", color="#90A4AE", lw=1.2, zorder=1)
+        ax.text(0.04, 0.94, "dashed: cost--benefit path", transform=ax.transAxes,
+                fontsize=7.5, color="#78909C")
         ax.set_xlabel("total cost (USD/day, amortised + energy)")
-        ax.set_ylabel("mean relief per person (degC)")
+        ax.set_ylabel("mean relief per person (°C)")
         ax.set_title(title)
     fig.savefig(os.path.join(FIG, "fig7_pareto.png")); plt.close(fig)
 
 def fig8_tornado():
-    fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.2))
+    fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.4))
     for ax, df, base, title in [
-            (axes[0], torn_df, torn_base_dry, "(a) hot-arid (41$^\\circ$C / 20% RH)"),
-            (axes[1], torn_df_humid, torn_base_humid, "(b) hot-humid (33$^\\circ$C / 70% RH)")]:
+            (axes[0], torn_df, torn_base_dry, "(a) hot-arid (41°C / 20% RH)"),
+            (axes[1], torn_df_humid, torn_base_humid, "(b) hot-humid (32°C / 63% RH)")]:
         y = np.arange(len(df))
         for i, (_, r) in enumerate(df.iterrows()):
             lo, hi = min(r["low"], r["high"]), max(r["low"], r["high"])
-            ax.barh(i, hi - base, left=base, color="#2ca02c", alpha=0.85)
-            ax.barh(i, lo - base, left=base, color="#d62728", alpha=0.85)
-        ax.set_yticks(y); ax.set_yticklabels(df["param"], fontsize=8)
-        ax.axvline(base, color="k", lw=1.4)
-        ax.set_xlabel("DHR of system B (person-$^\\circ$C$\\cdot$h/kWh)")
+            ax.barh(i, hi - base, left=base, color="#2E9E5B", alpha=0.88)
+            ax.barh(i, lo - base, left=base, color="#D64550", alpha=0.88)
+            if abs(hi - base) > 1:
+                ax.text(hi + 1.2, i, f"{hi:.0f}", va="center", fontsize=7.5, color="#2E9E5B")
+            if abs(lo - base) > 1:
+                ax.text(lo - 1.2, i, f"{lo:.0f}", va="center", ha="right", fontsize=7.5, color="#D64550")
+        ax.axvline(base, color=COL["ink"], lw=1.5)
+        ax.text(base, len(y) - 0.28, f"base {base:.0f}", ha="center", fontsize=8, fontweight="bold")
+        ax.set_yticks(y); ax.set_yticklabels(df["param"], fontsize=9)
+        ax.set_xlabel("DHR of system B (person-°C·h/kWh)")
         ax.set_title(title)
-    fig.suptitle("One-at-a-time sensitivity (green: high value, red: low value)", y=1.02)
+    fig.suptitle("One-at-a-time sensitivity — green: parameter raised, red: parameter lowered", y=1.03,
+                 fontsize=10.5, fontweight="bold")
     fig.savefig(os.path.join(FIG, "fig8_tornado.png")); plt.close(fig)
 
 def fig9_weights():
@@ -868,91 +961,71 @@ def fig9_weights():
     labels = list(robust["station_humid"].keys())
     vals = [robust["station_humid"][k] for k in labels]
     cols = [COL[k.split()[0]] for k in labels]
-    ax.bar(range(len(labels)), vals, color=cols)
+    bars = ax.bar(range(len(labels)), vals, color=cols, edgecolor="white", linewidth=0.6)
+    _vlab(ax, bars, "{:.0f}", fs=9, dy_frac=0.02)
     ax.set_xticks(range(len(labels)))
-    ax.set_xticklabels([l.split(" ")[0] for l in labels])
+    ax.set_xticklabels([l.split(" ")[0] for l in labels], fontweight="bold")
     ax.set_ylabel("times ranked #1 (of 400 random weight sets)")
     ax.set_title("Robustness of the effectiveness ranking to objective weights (station, hot-humid)")
+    ax.set_ylim(0, max(vals) * 1.15)
     fig.savefig(os.path.join(FIG, "fig9_weights.png")); plt.close(fig)
 
-def fig0_framework():
-    fig, ax = plt.subplots(figsize=(7.4, 6.0))
-    ax.set_xlim(0, 10); ax.set_ylim(0, 12); ax.axis("off")
-    layers = [
-        ("Inputs", "climate profiles (NOAA normals) · venue geometry\nfleet sizes & tariff / carbon intensity", "#f0f0f0"),
-        ("Layer 1 - Physics", "psychrometric wet bulb · evaporative / fan / refrigerative\nlimits · transient zone heat balance (30-s Euler)", "#dbe9f6"),
-        ("Layer 2 - People", "perceived temperature · comfort cap 27$^\\circ$C\nacceptable 30$^\\circ$C · WBGT$_{eff}$ heat strain", "#ddeddd"),
-        ("Layer 3 - Efficiency", "DHR = person-$^\\circ$C$\\cdot$h relief / kWh\ncost per delivered relief · CO$_2$ per season", "#fbe7c8"),
-        ("Layer 4 - Effectiveness", "hard service floor (80% acceptable) · weighted utility\nPareto frontier · grid-search optimisation · Monte-Carlo", "#f4d3d3"),
-        ("Decisions", "fleet selection · thermostat setpoints · tiered\noperations · extreme-heat playbook", "#e8e0f0"),
-    ]
-    y = 11.6
-    H = 1.45
-    for i, (t, sub, c) in enumerate(layers):
-        ax.add_patch(Rectangle((0.8, y - H), 8.4, H, fc=c, ec="k", lw=1.2))
-        ax.text(5.0, y - 0.38, t, ha="center", va="center", fontsize=11, weight="bold")
-        ax.text(5.0, y - 0.98, sub, ha="center", va="center", fontsize=8)
-        if i < len(layers) - 1:
-            ax.annotate("", xy=(5.0, y - H - 0.38), xytext=(5.0, y - H),
-                        arrowprops=dict(arrowstyle="->", lw=1.8))
-        y -= 1.92
-    ax.text(9.7, 9.6, "feedback:\nsensitivity &\nuncertainty\nre-open layer 1", fontsize=7.5,
-            ha="center", va="top", color="#555555")
-    ax.annotate("", xy=(9.55, 9.55), xytext=(9.55, 4.1),
-                arrowprops=dict(arrowstyle="->", lw=1.2, color="#888888",
-                                connectionstyle="arc3,rad=-0.35"))
-    fig.savefig(os.path.join(FIG, "fig0_framework.png")); plt.close(fig)
-
 def fig10_opt_surface():
-    fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.3))
+    fig, axes = plt.subplots(1, 2, figsize=(10.8, 4.4))
     for ax, cln, title in zip(axes, ["hot-arid", "hot-humid"],
                               ["(a) hot-arid", "(b) hot-humid"]):
         g = opt_results[cln]
         g70 = g[g["N_trigger"].astype(str) == "70.0"]
         piv = g70.pivot_table(index="band", columns="T_on", values="kWh")
-        feas = g70.pivot_table(index="band", columns="T_on", values="feasible")
         im = ax.pcolormesh(piv.columns, piv.index, piv.values, cmap="YlGnBu", shading="nearest")
-        fy, fx = np.where(feas.values.astype(bool))
-        ax.scatter(piv.columns[fx], piv.index[fy], marker="s", s=28, c="#2ca02c", zorder=3)
+        for yy in piv.index:
+            for xx in piv.columns:
+                v = piv.loc[yy, xx]
+                ax.text(xx, yy, f"{v:.0f}", ha="center", va="center", fontsize=7.2,
+                        color="white" if v > piv.values.mean() else COL["ink"])
         if len(opt_feas[cln]):
             b = opt_feas[cln].iloc[0]
-            ax.scatter([b["T_on"]], [b["band"]], marker="*", s=260, c="red", zorder=4,
-                       label="grid optimum")
-        ax.scatter([30.0], [2.5], marker="o", s=90, facecolor="white", edgecolor="k",
-                   zorder=4, label="nominal rule")
-        fig.colorbar(im, ax=ax, label="energy (kWh/day)")
-        ax.set_xlabel("thermostat ON threshold $T_{on}$ (degC perceived)")
-        ax.set_ylabel("hysteresis band (degC)")
-        ax.set_title(title); ax.legend(fontsize=7, loc="upper right")
+            ax.scatter([b["T_on"]], [b["band"]], marker="*", s=300, c="#D64550", zorder=4,
+                       edgecolor="white", lw=0.8)
+        ax.scatter([30.0], [2.5], marker="o", s=110, facecolor="white", edgecolor=COL["ink"],
+                   zorder=4, lw=1.4)
+        fig.colorbar(im, ax=ax, label="energy (kWh/day)", shrink=0.92)
+        ax.set_xlabel("thermostat ON threshold $T_{on}$ (°C perceived)")
+        ax.set_ylabel("hysteresis band (°C)")
+        ax.set_title(title)
     fig.savefig(os.path.join(FIG, "fig10_opt_surface.png")); plt.close(fig)
 
 def fig11_mc():
-    fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.2))
+    fig, axes = plt.subplots(1, 2, figsize=(10.8, 4.3))
     m_ar = mc_all[mc_all["clim"] == "hot-arid"]
-    axes[0].hist(m_ar["save3_vs2_pct"], bins=36, color="#1f77b4", alpha=0.75)
+    axes[0].hist(m_ar["save3_vs2_pct"], bins=36, color=COL["P1"], alpha=0.8,
+                 edgecolor="white", linewidth=0.4)
     nom = 100 * (1 - station_df[(station_df["climate"] == "hot-arid") &
                                 (station_df["policy"] == "P3 Hybrid auto")]["energy_kWh"].iloc[0] /
                  station_df[(station_df["climate"] == "hot-arid") &
                             (station_df["policy"] == "P2 Evap always")]["energy_kWh"].iloc[0])
-    axes[0].axvline(nom, color="r", ls="--", lw=1.5)
-    axes[0].text(nom, axes[0].get_ylim()[1] * 0.92, f" nominal {nom:.0f}%", color="r", fontsize=8)
+    axes[0].axvline(nom, color="#D64550", ls="--", lw=1.6)
+    axes[0].text(nom + 0.4, axes[0].get_ylim()[1] * 0.92, f"nominal {nom:.0f}%",
+                 color="#D64550", fontsize=8.5, fontweight="bold")
     axes[0].set_xlabel("hybrid energy saving vs always-on (%)")
     axes[0].set_ylabel("draws (of 400)")
     axes[0].set_title("(a) hot-arid: saving distribution")
     xs = np.sort(m_ar["ok3"]); ys = np.arange(1, len(xs) + 1) / len(xs)
-    axes[1].step(xs, ys, where="post", color=COL["P3"], lw=2)
-    axes[1].axvline(0.8, color="k", ls="--", lw=1.2)
+    axes[1].step(xs, ys, where="post", color=COL["P3"], lw=2.4)
+    axes[1].fill_betweenx(ys, 0.3, xs, step="post", color=COL["P3"], alpha=0.08)
+    axes[1].axvline(0.8, color=COL["ink"], ls="--", lw=1.3)
     pf = float((m_ar["ok3"] >= 0.8).mean())
-    axes[1].annotate(f"P(feasible) = {pf:.1%}", xy=(0.815, 0.10), fontsize=9)
+    axes[1].annotate(f"P(feasible) = {pf:.1%}", xy=(0.83, 0.10), fontsize=9.5,
+                     fontweight="bold", color=COL["ink"])
     axes[1].set_xlabel("acceptable share of person-time (hybrid)")
     axes[1].set_ylabel("cumulative probability")
     axes[1].set_xlim(0.3, 1.02); axes[1].set_title("(b) hot-arid: hybrid feasibility margin")
     fig.savefig(os.path.join(FIG, "fig11_mc.png")); plt.close(fig)
 
 def fig12_regime():
-    Ts = np.arange(28.0, 44.1, 0.5)
-    RHs = np.arange(0.15, 0.91, 0.05)
-    winners = np.zeros((len(RHs), len(Ts)))   # 0 none-safe, 1 fan, 2 evap B, 3 evap C
+    Ts = np.arange(28.0, 44.01, 0.25)
+    RHs = np.arange(0.15, 0.901, 0.025)
+    winners = np.zeros((len(RHs), len(Ts)))
     for i, RH in enumerate(RHs):
         for j, T in enumerate(Ts):
             scores = {}
@@ -967,22 +1040,37 @@ def fig12_regime():
             if scores:
                 winners[i, j] = max(scores, key=scores.get)
     from matplotlib.colors import ListedColormap, BoundaryNorm
-    cmap = ListedColormap(["#c0c0c0", "#1f77b4", "#ff7f0e", "#2ca02c"])
+    from matplotlib.patches import Patch
+    cmap = ListedColormap(["#B0BEC5", COL["A"], COL["B"], COL["C"]])
     norm = BoundaryNorm([-0.5, 0.5, 1.5, 2.5, 3.5], cmap.N)
-    fig, ax = plt.subplots(figsize=(8.4, 4.6))
-    pc = ax.pcolormesh(Ts, RHs * 100, winners, cmap=cmap, norm=norm, shading="nearest")
-    # wet-bulb-depression contour where system B reaches its rated cap
+    fig, ax = plt.subplots(figsize=(9.2, 4.9))
+    ax.pcolormesh(Ts, RHs * 100, winners, cmap=cmap, norm=norm, shading="nearest")
     D, R = np.meshgrid(Ts, RHs)
     dbd = D - np.array([[wet_bulb(t, r) for t in Ts] for r in RHs])
-    ax.contour(D, R * 100, dbd, levels=[5.88], colors="k", linestyles="--", linewidths=1.2)
-    ax.text(29.2, 77, "evap. B hits rated cap\n(dashed: DBD = 5.9 K)", fontsize=8)
-    from matplotlib.patches import Patch
-    ax.legend(handles=[Patch(fc="#c0c0c0", label="no system keeps person below strain"),
-                       Patch(fc="#1f77b4", label="fan wins (best feasible DHR)"),
-                       Patch(fc="#ff7f0e", label="medium evaporative wins"),
-                       Patch(fc="#2ca02c", label="large evaporative wins")],
+    ax.contour(D, R * 100, dbd, levels=[5.88], colors="white", linestyles="--", linewidths=1.3)
+    ax.text(40.8, 71.5, "System B rated-cap\nboundary (DBD = 5.9 K)", fontsize=7.5, color="white",
+            fontweight="bold", ha="center")
+    ax.text(31.0, 33, "FANS\nbest feasible DHR", fontsize=11, fontweight="bold", color="white",
+            ha="center")
+    ax.text(36.3, 76, "MEDIUM\nEVAP", fontsize=9.5, fontweight="bold", color="white", ha="center")
+    ax.text(42.7, 38, "LARGE\nEVAP", fontsize=9, fontweight="bold", color="white", ha="center")
+    ax.text(40.3, 86, "NO SYSTEM SUFFICES\n→ operational measures only", fontsize=9,
+            fontweight="bold", color="#455A64", ha="center")
+    cities = {"Phoenix": (41, 20, 6, 5), "Miami": (32, 63, 8, -14), "Guangzhou": (33, 75, 6, 5),
+              "Singapore": (31.5, 64, -16, 10), "Honolulu": (30, 52, 6, 5)}
+    for nm, (t, r, dx, dy) in cities.items():
+        ax.scatter(t, r, s=64, marker="D", c="white", edgecolor=COL["ink"], lw=1.3, zorder=5)
+        ax.annotate(nm, (t, r), textcoords="offset points", xytext=(dx, dy), fontsize=8,
+                    fontweight="bold", color=COL["ink"],
+                    bbox=dict(fc="white", ec="none", alpha=0.75, pad=0.6))
+    ax.legend(handles=[Patch(fc="#B0BEC5", label="no system keeps person below strain"),
+                       Patch(fc=COL["A"], label="fan wins (best feasible DHR)"),
+                       Patch(fc=COL["B"], label="medium evaporative wins"),
+                       Patch(fc=COL["C"], label="large evaporative wins"),
+                       plt.Line2D([], [], marker="D", ls="none", mfc="white", mec=COL["ink"],
+                                  ms=7, label="case-study climate")],
               fontsize=8, loc="upper left", framealpha=0.95)
-    ax.set_xlabel("dry-bulb temperature (degC)")
+    ax.set_xlabel("dry-bulb temperature (°C)")
     ax.set_ylabel("relative humidity (%)")
     ax.set_title("Technology regime map (bus stop, N=12): best feasible system by climate")
     fig.savefig(os.path.join(FIG, "fig12_regime.png")); plt.close(fig)

@@ -6,13 +6,13 @@
 - **`HiMCM_2026B_校赛解答.pdf`**（= `paper/paper_build.pdf`）— 19 页英文论文（≤25 页限制内），
   0 编译错误：Summary Sheet（恰好 1 页）→ 目录 → 完整五问解答（Req.1–5）→
   COO 备忘录（1.3 页）→ 公众博客 → 优缺点分析 → 8 条参考文献 → AI 使用报告（不计页数）
-- **`figures/`** — 论文 9 张图（200 dpi PNG）
+- **`figures/`** — 论文 13 张图（300 dpi，V3 专业配色 + 数值直标 + 城市标注）
 - **`output/`** — 全部数值结果 CSV + summary.json
 - **`audit/`** — 三轮审核的逐页渲染截图（验收记录）
 
 ## 一键复现
 ```bash
-python -X utf8 code/analysis.py      # 模型计算 + 9 张图 + CSV（约 40 秒）
+python -X utf8 code/analysis.py      # 模型计算 + 13 张图 + CSV（约 40 秒）
 python -X utf8 code/make_tables.py   # CSV -> LaTeX 表格片段
 python -X utf8 code/build_paper.py   # 注入表格 + pdflatex 两遍 -> paper/paper_build.pdf
 ```
