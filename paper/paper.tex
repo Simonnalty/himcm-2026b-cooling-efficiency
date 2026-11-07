@@ -39,7 +39,7 @@
 \begin{itemize}
 \item \textit{Bus stop (Req.~2a):} the fan is the efficiency champion (96 vs.\ 50 and 38.4 person-$\degrees$C$\cdot$h/kWh for fan, evaporative, and large evaporative in dry heat), \emph{but} at $41\degrees$C only the large evaporative cooler keeps a served person below heat-strain levels. The most efficient choice is not the safest.
 \item \textit{Rail station (Req.~2b):} the transient zonal model (thermal mass, surges, safety, economics) shows that a grid-optimised hybrid policy --- fans always on; the evaporative fleet behind a robust $27.5$--$30\degrees$C thermostat with pre-cooling --- delivers $\approx$100\% acceptable person-time at 43--50\% less energy than always-on operation (95.8 vs.\ 169.5 kWh/day in dry heat), and stays feasible in $\geq$98.8\% of 400 Monte-Carlo plant-uncertainty draws.
-\item \textit{Effectiveness (Req.~4):} under the hard service floor, no-cooling and fans-only options are infeasible in both climates; the hybrid wins in hot-arid (0.729) and hot-humid (0.613) climates, ranking first under 400/400 and 358/400 random weight draws. In humid heat, refrigerative cooling becomes competitive but its feasibility is fragile under uncertainty.
+\item \textit{Effectiveness (Req.~4):} under the hard service floor, no-cooling and fans-only options are infeasible in both climates; the hybrid wins in hot-arid (0.729) and hot-humid (0.613) climates, ranking first under 400/400 and 358/400 random weight draws. In humid heat, refrigerative cooling becomes a robust competitor (feasible in every humid draw); in dry heat it fails in every draw.
 \item \textit{Scaling (Req.~3):} the same equations transfer unchanged across four venues in four climates; occupancy density, rated drop and power dominate dry-heat sensitivity, while humidity and the comfort cap govern humid heat (large-cooler $\DHR$ collapses from 213 in Phoenix to 10 in Singapore).
 \end{itemize}
 
@@ -107,7 +107,7 @@ These five families motivate the design of our models: a service-based numerator
 \item Semi-open hall ($40\times12\times4$~m): air exchange $\lambda = 3 + 2v$ ACH ($v$ = wind, m/s); envelope $UA=180$~W/K; solar gain through the open front up to 4~kW; effective thermal mass 4 air-volumes (structure included).
 \item Train timetable: arrivals every 12 min at peaks (7--9h, 17--19h) and 20 min otherwise; each arrival adds a pulse of $\approx$70 passengers decaying in $\tau=4$~min (platform clearing), occupancy capped at 140.
 \item Electricity at \$0.14/kWh; capital costs: fan \$250, evaporative \$900, large evaporative \$2200 (bus stop, 6-year life); station fleets \$10k (evaporative) / \$7k (refrigerative) over 7 years.
-\item Indoor wet-bulb shift: evaporative operation adds moisture ($+0.2$ to $+0.4$~K), refrigerative units dehumidify ($-1.4$~K). \textit{Justification:} mass balance at the high air-exchange rates of a semi-open hall.
+\item Indoor wet-bulb shift: occupants add $\approx+0.4$~K; evaporative operation a further $\approx+0.2$~K; refrigerative units dehumidify ($-1.4$~K). \textit{Justification:} mass balance at the high air-exchange rates of a semi-open hall.
 \end{enumerate}
 
 \begin{table}[H]\centering\small
@@ -194,7 +194,7 @@ Climate & System & $\Delta T$ (\degrees C) & served & $r$ (\degrees C) & $T_p$ (
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:bus} and Fig.~\ref{fig:bus} carry the punchline. In every climate the fan dominates $\DHR$ --- 96 person-$\degrees$C$\cdot$h/kWh in Phoenix against 50 (B) and 38.4 (C) --- because 0.25~kW buys a genuine $3\degrees$C of felt relief. Evaporative systems are clawed back by the wet bulb: at Miami's July normals ($32\degrees$C/63\%) both B and C sit within $0.05\degrees$C of the same wet-bulb-limited $4.95\degrees$C (Eq.~\ref{eq:evap}), so the cheaper B beats C at 49.5 vs.\ 23.8. In mild Honolulu the comfort cap Eq.~(\ref{eq:cap}) binds for the evaporative systems while the fan is throttled by humidity (Eq.~\ref{eq:fan}): at $30\degrees$C ambient only $3\degrees$C of relief is worth buying, again favouring the cheap fan.
+Table~\ref{tab:bus} and Fig.~\ref{fig:bus} carry the punchline. In every climate the fan dominates $\DHR$ --- 96 person-$\degrees$C$\cdot$h/kWh in Phoenix against 50 (B) and 38.4 (C) --- because 0.25~kW buys a genuine $3\degrees$C of felt relief. Evaporative systems are clawed back by the wet bulb: at Miami's July normals ($32\degrees$C/63\%) both B and C sit within $0.05\degrees$C of the same wet-bulb-limited $4.95\degrees$C (Eq.~\ref{eq:evap}), so the cheaper B beats C at 49.5 vs.\ 23.8. In mild Honolulu the comfort cap Eq.~(\ref{eq:cap}) binds for the evaporative systems while the fan is throttled by humidity (Eq.~\ref{eq:fan}): at $30\degrees$C ambient only $3\degrees$C of relief is worth buying, again favouring the cheap fan. The complete 36-combination table is given in Appendix~A.
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.98\linewidth]{fig2_system_response.png}
@@ -246,13 +246,13 @@ T_p = T_{in} - \Delta T_{\text{fan}},\qquad
 and we track (i) \textbf{heat-strain exposure} $H=\int N\,[\max(0,\text{WBGT}_{\text{eff}}-32)+\max(0,T_p-38)]\,dt$ in person-$\degrees$C$\cdot$h, (ii) \textbf{acceptable share} of person-time ($T_p\leq30\degrees$C and WBGT$_{\text{eff}}\leq32$), (iii) relief vs.\ the uncooled baseline, and (iv) daily cost (energy + amortised capital).
 
 \subsection{Numerical validation}
-Two checks are run before the model is used. \textbf{Energy-balance closure:} under constant forcing ($T_{out}=38\degrees$C, $RH=15\%$, $N=25$, $S=3$~kW, fleet on), Eq.~(\ref{eq:ode}) admits the analytic equilibrium $T_{in}^{*}=T_{out}-(Q_c-S-Nq_p)/(UA+G_v)$; the simulation converges to it to within $10^{-3}\,\degrees$C. \textbf{Step-size convergence:} refining the Euler step from 120~s to 7.5~s moves daily energy by at most $1.3\%$ (Table~\ref{tab:valid}); the 30~s production step is retained.
+Two checks are run before the model is used. \textbf{Energy-balance closure:} under constant forcing ($T_{out}=38\degrees$C, $RH=15\%$, $N=25$, $S=3$~kW, fleet on), Eq.~(\ref{eq:ode}) admits the analytic equilibrium $T_{in}^{*}=T_{out}-(Q_c-S-Nq_p)/(UA+G_v)$; the simulation converges to it to within $10^{-3}\,\degrees$C. \textbf{Step-size convergence:} refining the Euler step from 120~s to 7.5~s moves daily energy by at most $0.5\%$ (Table~\ref{tab:valid}); the 30~s production step is retained.
 
 \subsection{Operating policies}
 P0: nothing. P1: ceiling fans always (0.6~kW). P2: four large evaporative units always on. P3 (\textit{our policy}): fans always; evaporative fleet on a thermostat with hysteresis --- ON when $T_p>30\degrees$C or crowds exceed 70, OFF when $T_p<27.5\degrees$C, plus pre-cooling windows before the morning/evening surges. P4: refrigerative always on.
 
 \begin{table}[H]\centering\small
-\caption{Euler step-size study (P3, hot-arid design day): energy is step-size insensitive to $\pm1.3\%$.}\label{tab:valid}
+\caption{Euler step-size study (P3, hot-arid design day): energy is step-size insensitive to $\pm0.5\%$.}\label{tab:valid}
 \begin{tabular}{@{}rrrr@{}}
 \toprule
 $\Delta t$ (s) & kWh/day & $\max T_{in}$ (\degrees C) & $|$dev$|$ from finest (kWh)\\
@@ -339,11 +339,11 @@ Panel & Option & feasible & perf & exp & energy & cost & $E^\ast$\\
 \textbf{Findings.} The efficiency ranking and the effectiveness ranking disagree --- and the disagreement is the message. In the dry bus stop, the fan (efficiency champion) is \emph{infeasible} at $41\degrees$C, and effectiveness selects the large cooler ($E^\ast=0.574$); in humid heat the fan is feasible again and wins ($E^\ast=0.749$). In the station, the hybrid thermostat policy wins everywhere: $E^\ast=0.729$ in hot-arid climates (first under 400/400 random weight sets) and $E^\ast=0.613$ in hot-humid (358/400, with the remainder going to always-on evaporative). Without the hard floor, doing nothing scores respectably whenever cost/energy weights are large --- which is precisely why safety must be a constraint, not a preference.
 
 \subsection{Uncertainty quantification}
-Field plant never matches the datasheet, so we re-run both climates under 400 Monte-Carlo draws that jointly perturb $UA$ ($\pm$30\%), air exchange ($\pm$40\%), thermal mass, metabolic heat, surge size, evaporative effectiveness and recirculation (ranges in Table~\ref{tab:prov}), re-simulating each policy against its own perturbed baseline. Results (Fig.~\ref{fig:mc}, Table~\ref{tab:mc}): the hybrid's saving over always-on operation has 90\% interval 37.9--47.7\% (hot-arid) and 43.3--52.8\% (hot-humid); the hybrid stays feasible in 98.8\% and 100\% of draws and is the lowest-energy feasible option in 98.8--100\% of them. Refrigerative feasibility in humid heat, certain on the nominal model, is exposed as fragile: adverse draws fail the floor. Efficiency claims that survive this test may be called robust; ours do.
+Field plant never matches the datasheet, so we re-run both climates under 400 Monte-Carlo draws that jointly perturb $UA$ ($\pm$30\%), air exchange ($\pm$40\%), thermal mass, metabolic heat, surge size, evaporative effectiveness and recirculation (ranges in Table~\ref{tab:prov}), re-simulating each policy against its own perturbed baseline. Results (Fig.~\ref{fig:mc}, Table~\ref{tab:mc}): the hybrid's saving over always-on operation has 90\% interval 37.9--47.7\% (hot-arid) and 43.3--52.8\% (hot-humid); the hybrid stays feasible in 98.8\% (hot-arid) and 100\% (hot-humid) of draws and is the lowest-energy feasible option in 98.8--100\% of them. The arid hybrid's fragility margin is real but thin: the 1.2\% of failing draws combine a weak plant (low effectiveness, poor recirculation) with the hottest afternoon. Refrigerative cooling, after calibration to Guangzhou normals, is feasible in every humid draw --- its weakness is not uncertainty but climate: it fails the floor in \emph{every} hot-arid draw. Efficiency claims that survive this test may be called robust; ours do.
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.98\linewidth]{fig11_mc.png}
-\caption{Monte-Carlo uncertainty (400 draws). (a) hybrid energy saving vs.\ always-on (hot-arid); the dashed line is the nominal model. (b) acceptable-share distributions in humid heat: refrigerative feasibility is fragile, the hybrid is not.}\label{fig:mc}
+\caption{Monte-Carlo uncertainty (400 draws). (a) hybrid energy saving vs.\ always-on (hot-arid); the dashed line is the nominal model. (b) acceptable-share distribution of the hybrid in hot-arid: 1.2\% of adverse draws dip below the 0.80 floor.}\label{fig:mc}
 \end{figure}
 
 \begin{table}[H]\centering\small
@@ -373,7 +373,7 @@ Parameter & low/high & swing & low/high & swing\\
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.97\linewidth]{fig8_tornado.png}
-\caption{Tornado charts. In dry heat the evaporative system runs at its rated cap, so climate parameters swing $\DHR$ by zero; in humid heat, humidity and air temperature become first-order drivers.}\label{fig:tornado}
+\caption{Tornado charts. In dry heat the evaporative system runs at its rated cap, so climate parameters swing $\DHR$ by zero; in humid heat, air temperature (through the comfort cap) and occupancy dominate, with the rated drop and humidity close behind.}\label{fig:tornado}
 \end{figure}
 
 %=====================================================================
@@ -409,7 +409,7 @@ Venue & Fans & Medium evap. & Large evap.\\
 \textbf{Characteristics that contribute most to efficient cooling} (from Tables~\ref{tab:tornado}--\ref{tab:venue}):
 \begin{enumerate}
 \item \textbf{Occupancy density} --- cooling delivered per kWh scales with how many people share the footprint (top swing in both climates).
-\item \textbf{Wet-bulb depression / humidity} --- zero importance in dry heat (systems run at rated cap), first-order in humid heat.
+\item \textbf{Wet-bulb depression / humidity} --- zero importance in dry heat (systems run at rated cap); at Miami normals the cooler sits right at its rated-cap boundary, so air temperature, occupancy and the rated drop lead, with humidity a clear secondary driver.
 \item \textbf{Rated drop vs.\ electric power} --- the efficiency lever of procurement; over-sizing wastes kWh.
 \item \textbf{Coverage area} --- matters only near the crossover where the footprint stops covering everyone.
 \item \textbf{Enclosure fraction and wind} --- set $\lambda$ in Eq.~(\ref{eq:ode}); the reason semi-open halls can be cooled at all.
@@ -484,7 +484,7 @@ We built a simple score: for every kilowatt-hour of electricity, how many \emph{
 
 \textbf{1. The humble fan is a superstar --- usually.} A small 0.25~kW fan --- about three cents an hour to run --- makes you \emph{feel} about 3$\degrees$C cooler by helping your sweat do its job. Per unit of energy, that beats big cooling machines by a factor of 2--3. But there's a catch: at 41$\degrees$C in dry heat, a fan leaves you at a dangerous 38$\degrees$C. Cheap comfort, yes --- but past a threshold, only real cooling keeps you safe.
 
-\textbf{2. ``Up to 8$\degrees$C cooler'' depends on where you live.} Evaporative coolers work by evaporating water, and air can only swallow so much vapour. In dry Phoenix air they hit their full rating. In humid Singapore they manage barely three quarters of it --- the same machine that scores 213 in Phoenix scores just 10. The wet-bulb temperature is the ceiling; check it before you buy.
+\textbf{2. ``Up to 8$\degrees$C cooler'' depends on where you live.} Evaporative coolers work by evaporating water, and air can only swallow so much vapour. In dry Phoenix air they hit their full rating. In humid Singapore they manage about 60 percent of it --- the same machine that scores 213 in Phoenix scores just 10. The wet-bulb temperature is the ceiling; check it before you buy.
 
 \textbf{3. \emph{When} matters as much as \emph{what}.} Cooling an empty waiting hall is pure waste. Smart controls that run the machines only when people are actually hot --- switching on near 30$\degrees$C, off near 27.5$\degrees$C, and pre-chilling before a train dumps 70 passengers onto the platform --- deliver the same comfort as running flat-out all day, on \textbf{half the electricity}.
 

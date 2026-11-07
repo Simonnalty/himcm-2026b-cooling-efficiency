@@ -724,7 +724,7 @@ def fig2_response():
     ax.axvline(5.8, ls="--", c="gray", lw=1)
     ax.annotate("Miami-type humid\ndepression $\\approx$ 5.8 K", xy=(5.8, 4.2), fontsize=8,
                 xytext=(7.4, 1.6), arrowprops=dict(arrowstyle="->", lw=1))
-    ax.annotate("Phoenix-type dry\ndepression $\\approx$ 19 K", xy=(18, 8), fontsize=8, ha="right")
+    ax.annotate("Phoenix-type dry\ndepression $\\approx$ 18 K", xy=(18, 8), fontsize=8, ha="right")
     ax.set_xlabel("Wet-bulb depression $T_{db}-T_{wb}$ (K)")
     ax.set_ylabel("Actual air-temperature drop (degC)")
     ax.set_title("(a) Evaporative systems: climate-limited")
@@ -939,16 +939,14 @@ def fig11_mc():
     axes[0].set_xlabel("hybrid energy saving vs always-on (%)")
     axes[0].set_ylabel("draws (of 400)")
     axes[0].set_title("(a) hot-arid: saving distribution")
-    m_hu = mc_all[mc_all["clim"] == "hot-humid"]
-    for col, lab, colr in [("ok3", "P3 hybrid", COL["P3"]), ("ok4", "P4 refrigerative", COL["P4"])]:
-        xs = np.sort(m_hu[col]); ys = np.arange(1, len(xs) + 1) / len(xs)
-        axes[1].step(xs, ys, where="post", color=colr, lw=1.8, label=lab)
+    xs = np.sort(m_ar["ok3"]); ys = np.arange(1, len(xs) + 1) / len(xs)
+    axes[1].step(xs, ys, where="post", color=COL["P3"], lw=2)
     axes[1].axvline(0.8, color="k", ls="--", lw=1.2)
-    axes[1].text(0.815, 0.06, "service floor 0.80", fontsize=8)
-    axes[1].set_xlabel("acceptable share of person-time")
+    pf = float((m_ar["ok3"] >= 0.8).mean())
+    axes[1].annotate(f"P(feasible) = {pf:.1%}", xy=(0.815, 0.10), fontsize=9)
+    axes[1].set_xlabel("acceptable share of person-time (hybrid)")
     axes[1].set_ylabel("cumulative probability")
-    axes[1].set_xlim(0.3, 1.02); axes[1].set_title("(b) hot-humid: feasibility under plant uncertainty")
-    axes[1].legend(fontsize=8, loc="upper left")
+    axes[1].set_xlim(0.3, 1.02); axes[1].set_title("(b) hot-arid: hybrid feasibility margin")
     fig.savefig(os.path.join(FIG, "fig11_mc.png")); plt.close(fig)
 
 def fig12_regime():
